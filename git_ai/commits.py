@@ -10,7 +10,7 @@ from git_ai.llm_client import LLMClient
 
 class Commits:
 
-    def get_commit_prompt(self, diff_output: str):
+    def get_commit_prompt(self, diff_output: str, max_chars) -> list[dict[str, str]]:
         """
         Generates a commit prompt based on the given diff output.
 
@@ -22,12 +22,16 @@ class Commits:
                 - 'role': The role of the message (either 'system' or 'user').
                 - 'content': The content of the message.
         """
+
+        if max_chars == 0:
+            max_chars = Config().get_option("max_chars")
+
         return [
             {
                 "role": "system",
-                "content": """
+                "content": f"""
                             You are a helpful agent that evaluates changes in repositories and summarizes them into a git commit message. 
-                            Given a list of changes, summarize all changes into a single, concise commit message that is no more than 100 characters.
+                            Given a list of changes, summarize all changes into a single, concise commit message that is no more than {max_chars} characters.
                             Ignore minor changes if needed to keep the message concise and within the character limit. 
                             Only output the single git commit message.
                             """,
@@ -40,7 +44,7 @@ class Commits:
             },
         ]
 
-    def get_commit_message(self) -> str:
+    def get_commit_message(self, max_chars: int) -> str:
         """
         Retrieves the commit message for the changes made in the current branch.
 
@@ -81,7 +85,7 @@ class Commits:
 
             # Generate commit message using a LLM
             client = LLMClient()
-            prompt = self.get_commit_prompt(diff_output)
+            prompt = self.get_commit_prompt(diff_output, max_chars)
             response = client.prompt(prompt)
 
             if response != "":

@@ -9,6 +9,7 @@ CONFIG_FILE_PATH = os.path.join(
 class Config:
     provider: str = None
     max_changes: int = 500
+    max_chars: int = 80
     openai: str = None
 
     def set_option(self, option: str, value: str):

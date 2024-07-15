@@ -27,14 +27,22 @@ def test():
 
 
 @app.command()
-def commit():
+def commit(
+    max_chars: Annotated[
+        int,
+        typer.Option(
+            help="Override default # of max characters for the commit message.",
+            show_default=False,
+        ),
+    ] = 0,
+):
     """
     Generate a commit message
     """
     commits = Commits()
     message = None
     while not message:
-        message = commits.get_commit_message()
+        message = commits.get_commit_message(max_chars)
         if message == "":
             raise typer.Exit()
 
@@ -75,6 +83,14 @@ def config(
         bool,
         typer.Option(
             help="Maximum # of changes per file. Files with more changes will not be summarized. (Default: 500)",
+            show_default=False,
+            rich_help_panel="Configuration",
+        ),
+    ] = False,
+    max_chars: Annotated[
+        bool,
+        typer.Option(
+            help="Maximum # of characters the commit message should be (Default: 80)",
             show_default=False,
             rich_help_panel="Configuration",
         ),
