@@ -2,7 +2,7 @@ import os
 import yaml
 
 CONFIG_FILE_PATH = os.path.join(
-    os.path.expanduser("~"), ".config", "git-ai", "config.yml"
+    os.path.expanduser("~"), ".config", "gaid", "config.yml"
 )
 
 
@@ -10,6 +10,7 @@ class Config:
     provider: str = None
     max_changes: int = 500
     max_chars: int = 80
+    default_branch: str = "main"
     openai: str = None
 
     def set_option(self, option: str, value: str):

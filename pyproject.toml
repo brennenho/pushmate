@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "git-ai"
+name = "gaid"
 version = "0.1.0"
 description = ""
-authors = ["Brennen Ho <git-ai@brennen.dev>"]
+authors = ["Brennen Ho <gaid@brennen.dev>"]
 readme = "README.md"
 
 [tool.poetry.scripts]
-git-ai = "git_ai.main:app"
+gaid = "gaid.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.12"

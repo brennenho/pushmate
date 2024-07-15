@@ -5,8 +5,9 @@ from rich.markdown import Markdown
 from rich.prompt import Prompt
 from typing import Annotated, Optional
 
-from git_ai.commits import Commits
-from git_ai.config import Config
+from gaid.commits import Commits
+from gaid.config import Config
+from gaid.git import create_commit
 
 app = typer.Typer(no_args_is_help=True, rich_markup_mode="rich")
 
@@ -59,7 +60,15 @@ def commit(
         elif confirmation.lower() == "regen":
             message = None
 
-    commits.create_commit(message)
+    create_commit(message)
+
+
+@app.command()
+def pr():
+    """
+    Generate a pull request
+    """
+    typer.echo("Not implemented")
 
 
 @app.command()
@@ -95,6 +104,13 @@ def config(
             rich_help_panel="Configuration",
         ),
     ] = False,
+    default_branch: Annotated[
+        str,
+        typer.Option(
+            help="The default git branch to compare against when generating PRs",
+            rich_help_panel="Configuration",
+        ),
+    ] = "main",
     openai: Annotated[
         bool,
         typer.Option(

@@ -1,8 +1,8 @@
 from enum import Enum
 from openai import OpenAI
 
-from git_ai.config import Config
-from git_ai.messages import print_error
+from gaid.config import Config
+from gaid.messages import print_error
 
 
 class LLMProvider(Enum):
@@ -21,7 +21,7 @@ class LLMClient:
         self.status = True
         if not self.provider:
             print_error(
-                "No provider set. Use [italic]git-ai config --provider[/italic] to set a provider."
+                "No provider set. Use [italic]gaid config --provider[/italic] to set a provider."
             )
             self.status = False
         self.model = ""
