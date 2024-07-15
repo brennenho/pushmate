@@ -15,11 +15,9 @@ class Commits:
             {
                 "role": "system",
                 "content": """
-                            You are a helpful agent that evaluates changes in repositories. 
-                            Given a diff output, summarize all changes made in the diff into a single, 
-                            concise commit message for use in a git commit. 
-                            Limit the commit message to a single sentence with a 100 character limit. 
-                            Ignore minor changes if needed to keep the message concise. 
+                            You are a helpful agent that evaluates changes in repositories and summarizes them into a git commit message. 
+                            Given a list of changes, summarize all changes into a single, concise commit message that is no more than 100 characters.
+                            Ignore minor changes if needed to keep the message concise and within the character limit. 
                             Only output the single git commit message.
                             """,
             },
