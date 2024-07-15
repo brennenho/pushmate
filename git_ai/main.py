@@ -71,6 +71,14 @@ def config(
             rich_help_panel="Configuration",
         ),
     ] = False,
+    max_changes: Annotated[
+        bool,
+        typer.Option(
+            help="Maximum # of changes per file. Files with more changes will not be summarized. (Default: 500)",
+            show_default=False,
+            rich_help_panel="Configuration",
+        ),
+    ] = False,
     openai: Annotated[
         bool,
         typer.Option(
