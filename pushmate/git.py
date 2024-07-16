@@ -3,8 +3,8 @@ import subprocess
 
 from enum import Enum
 
-from gaid.config import Config
-from gaid.messages import print_error, print_success, print_warning
+from pushmate.config import Config
+from pushmate.messages import print_error, print_success, print_warning
 
 
 class GitTarget(Enum):

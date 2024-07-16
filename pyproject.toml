@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "gaid"
+name = "pushmate"
 version = "0.1.0"
 description = ""
-authors = ["Brennen Ho <gaid@brennen.dev>"]
+authors = ["Brennen Ho <pushmate@brennen.dev>"]
 readme = "README.md"
 
 [tool.poetry.scripts]
-gaid = "gaid.main:app"
+pm = "pushmate.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.12"

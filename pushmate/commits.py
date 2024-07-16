@@ -3,10 +3,10 @@ import subprocess
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 
-from gaid.config import Config
-from gaid.git import GitTarget, get_diffs
-from gaid.messages import print_error, print_success, print_warning
-from gaid.llm_client import LLMClient
+from pushmate.config import Config
+from pushmate.git import GitTarget, get_diffs
+from pushmate.messages import print_error, print_success, print_warning
+from pushmate.llm_client import LLMClient
 
 
 class Commits:

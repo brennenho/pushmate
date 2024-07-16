@@ -5,11 +5,11 @@ from rich.markdown import Markdown
 from rich.prompt import Prompt
 from typing import Annotated, Optional
 
-from gaid.commits import Commits
-from gaid.config import Config
-from gaid.git import create_commit
-from gaid.github import create_pr
-from gaid.pull_requests import PullRequests
+from pushmate.commits import Commits
+from pushmate.config import Config
+from pushmate.git import create_commit
+from pushmate.github import create_pr
+from pushmate.pull_requests import PullRequests
 
 app = typer.Typer(no_args_is_help=True, rich_markup_mode="rich")
 
@@ -127,13 +127,13 @@ def config(
         ),
     ] = False,
     github_token: Annotated[
-        str,
+        bool,
         typer.Option(
             help="GitHub token to use for PRs",
             show_default=False,
             rich_help_panel="Configuration",
         ),
-    ] = "main",
+    ] = False,
     openai: Annotated[
         bool,
         typer.Option(

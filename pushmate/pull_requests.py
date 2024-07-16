@@ -1,9 +1,9 @@
-from gaid.git import GitTarget, get_diffs
+from pushmate.git import GitTarget, get_diffs
 from rich import print
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-from gaid.llm_client import LLMClient
-from gaid.messages import print_success
+from pushmate.llm_client import LLMClient
+from pushmate.messages import print_success
 
 
 class PullRequests:

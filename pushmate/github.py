@@ -1,8 +1,8 @@
 import requests
 
-from gaid.config import Config
-from gaid.git import get_repo_info
-from gaid.utils import parse_pr
+from pushmate.config import Config
+from pushmate.git import get_repo_info
+from pushmate.utils import parse_pr
 
 
 headers = {

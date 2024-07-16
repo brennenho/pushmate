@@ -1,9 +1,7 @@
 import os
 import yaml
 
-CONFIG_FILE_PATH = os.path.join(
-    os.path.expanduser("~"), ".config", "gaid", "config.yml"
-)
+CONFIG_FILE_PATH = os.path.join(os.path.expanduser("~"), ".config", "pm", "config.yml")
 
 
 class Config:
