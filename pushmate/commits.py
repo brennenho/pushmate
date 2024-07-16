@@ -1,12 +1,11 @@
-import subprocess
-
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 
 from pushmate.config import Config
 from pushmate.git import GitTarget, get_diffs
-from pushmate.messages import print_error, print_success, print_warning
+from pushmate.messages import print_success
 from pushmate.llm_client import LLMClient
+from pushmate.utils import PauseProgress
 
 
 class Commits:
@@ -52,24 +51,17 @@ class Commits:
         Returns:
             str: The generated commit message.
         """
-        with Progress(
-            SpinnerColumn(),
-            TextColumn("[progress.description]{task.description}"),
-            transient=True,
-        ) as progress:
-            progress.add_task(description="Generating commit message...", total=None)
+        diff_output = get_diffs(GitTarget.COMMIT)
 
-            diff_output = get_diffs(GitTarget.COMMIT)
+        if not diff_output:
+            return ""
 
-            if diff_output == "":
-                return ""
+        # Generate commit message using a LLM
+        client = LLMClient()
+        prompt = self.get_commit_prompt(diff_output, max_chars)
+        response = client.prompt(prompt)
 
-            # Generate commit message using a LLM
-            client = LLMClient()
-            prompt = self.get_commit_prompt(diff_output, max_chars)
-            response = client.prompt(prompt)
+        if response != "":
+            print_success("commit message generated")
 
-            if response != "":
-                print_success("Commit message generated.")
-
-            return response
+        return response

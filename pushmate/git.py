@@ -2,9 +2,10 @@ import re
 import subprocess
 
 from enum import Enum
+from rich.prompt import Prompt
 
 from pushmate.config import Config
-from pushmate.messages import print_error, print_success, print_warning
+from pushmate.messages import print_error, print_success
 
 
 class GitTarget(Enum):
@@ -42,7 +43,6 @@ def get_diffs(target: GitTarget, branch: str = "") -> str:
         Returns None if there are no changes staged to commit or if an error occurs.
     """
     try:
-        config = Config()
         default_branch = get_repo_info().default_branch
         if target == GitTarget.COMMIT:
             diff_stat = subprocess.run(
@@ -56,9 +56,7 @@ def get_diffs(target: GitTarget, branch: str = "") -> str:
             )
 
         if "error: unknown option `cached'" in diff_stat.stderr:
-            print_error(
-                "Not a git repository. Please initialize a git repository and try again."
-            )
+            print_error("not in a git repository")
             return None
 
         if diff_stat.returncode == 0:
@@ -66,7 +64,7 @@ def get_diffs(target: GitTarget, branch: str = "") -> str:
 
             # Empty diff output means no changes staged to commit
             if not diff_output:
-                print_error("No changes staged to commit.")
+                print_error("no changes staged to commit")
                 return None
         else:
             return None
@@ -83,9 +81,13 @@ def get_diffs(target: GitTarget, branch: str = "") -> str:
                 if changes.isdigit() and int(changes) <= max_changes:
                     files_within_limit.append(filename)
                 else:
-                    print_warning(
-                        f"File [bold]{filename}[/bold] has {changes} changes. Skipping file in LLM summary."
+                    remove = Prompt.ask(
+                        f"[yellow]file [bold]{filename}[/bold] has {changes} changes, remove from commit?[/yellow]",
+                        choices=["Y", "n"],
+                        default="Y",
                     )
+                    if remove.lower() == "n":
+                        files_within_limit.append(filename)
 
         diff_output = ""
         for file in files_within_limit:
@@ -107,7 +109,7 @@ def get_diffs(target: GitTarget, branch: str = "") -> str:
 
     except Exception as e:
         if "No such file or directory: 'git'" in str(e):
-            print_error("Git is not installed. Please install git and try again.")
+            print_error("git is not installed")
         else:
             print_error()
         return None
@@ -152,5 +154,5 @@ def get_repo_info() -> RepoInfo:
 
         return info
     except Exception as e:
-        print(f"Error: {e}")
+        print_error()
         return None, None, None, None

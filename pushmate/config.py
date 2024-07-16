@@ -7,7 +7,7 @@ CONFIG_FILE_PATH = os.path.join(os.path.expanduser("~"), ".config", "pm", "confi
 class Config:
     provider: str = None
     max_changes: int = 500
-    max_chars: int = 80
+    max_chars: int = 50
     github_token: str = ""
     openai: str = None
 
