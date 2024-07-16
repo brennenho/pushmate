@@ -1,18 +1,19 @@
 [tool.poetry]
-name = "git-ai"
+name = "pushmate"
 version = "0.1.0"
 description = ""
-authors = ["Brennen Ho <git-ai@brennen.dev>"]
+authors = ["Brennen Ho <pushmate@brennen.dev>"]
 readme = "README.md"
 
 [tool.poetry.scripts]
-git-ai = "git_ai.main:app"
+pm = "pushmate.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.12"
 typer = {extras = ["all"], version = "^0.12.3"}
 pyyaml = "^6.0.1"
 openai = "^1.35.13"
+requests = "^2.32.3"
 
 
 [build-system]

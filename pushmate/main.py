@@ -5,8 +5,11 @@ from rich.markdown import Markdown
 from rich.prompt import Prompt
 from typing import Annotated, Optional
 
-from git_ai.commits import Commits
-from git_ai.config import Config
+from pushmate.commits import Commits
+from pushmate.config import Config
+from pushmate.git import create_commit
+from pushmate.github import create_pr
+from pushmate.pull_requests import PullRequests
 
 app = typer.Typer(no_args_is_help=True, rich_markup_mode="rich")
 
@@ -59,7 +62,35 @@ def commit(
         elif confirmation.lower() == "regen":
             message = None
 
-    commits.create_commit(message)
+    create_commit(message)
+
+
+@app.command()
+def pr():
+    """
+    Generate a pull request
+    """
+    prs = PullRequests()
+    message = None
+    while not message:
+        message = prs.get_pr_message()
+        if not message:
+            raise typer.Exit()
+
+        print(f":bookmark: | [bold blue]Message:[/bold blue]")
+        print(Markdown(f"```md\n{message}\n```"))
+        confirmation = Prompt.ask(
+            ":question: | [bold]Create pull request with this message?[/bold]",
+            choices=["y", "n", "regen"],
+        )
+
+        if confirmation.lower() == "n":
+            print(":x: | [bold red]Pull request aborted[/bold red]")
+            raise typer.Exit()
+        elif confirmation.lower() == "regen":
+            message = None
+
+    create_pr(message)
 
 
 @app.command()
@@ -91,6 +122,14 @@ def config(
         bool,
         typer.Option(
             help="Maximum # of characters the commit message should be (Default: 80)",
+            show_default=False,
+            rich_help_panel="Configuration",
+        ),
+    ] = False,
+    github_token: Annotated[
+        bool,
+        typer.Option(
+            help="GitHub token to use for PRs",
             show_default=False,
             rich_help_panel="Configuration",
         ),

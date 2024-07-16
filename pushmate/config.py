@@ -1,15 +1,14 @@
 import os
 import yaml
 
-CONFIG_FILE_PATH = os.path.join(
-    os.path.expanduser("~"), ".config", "git-ai", "config.yml"
-)
+CONFIG_FILE_PATH = os.path.join(os.path.expanduser("~"), ".config", "pm", "config.yml")
 
 
 class Config:
     provider: str = None
     max_changes: int = 500
     max_chars: int = 80
+    github_token: str = ""
     openai: str = None
 
     def set_option(self, option: str, value: str):
