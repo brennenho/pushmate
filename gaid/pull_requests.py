@@ -1,4 +1,9 @@
+from gaid.git import GitTarget, get_diffs
+from rich import print
 from rich.progress import Progress, SpinnerColumn, TextColumn
+
+from gaid.llm_client import LLMClient
+from gaid.messages import print_success
 
 
 class PullRequests:
@@ -36,7 +41,7 @@ class PullRequests:
             },
         ]
 
-    def get_pr(self) -> str:
+    def get_pr_message(self) -> str:
         """
         Generate a pull request based on the changes made in the current branch.
 
@@ -48,4 +53,19 @@ class PullRequests:
             TextColumn("[progress.description]{task.description}"),
             transient=True,
         ) as progress:
-            pass
+            progress.add_task(
+                description="Generating pull request message...", total=None
+            )
+
+            diff_output = get_diffs(GitTarget.PR)
+            if not diff_output:
+                return None
+
+            client = LLMClient()
+            prompt = self.get_pr_prompt(diff_output)
+            response = client.prompt(prompt)
+
+            if response != "":
+                print_success("Commit message generated.")
+
+            return response

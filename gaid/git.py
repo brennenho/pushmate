@@ -1,3 +1,4 @@
+import re
 import subprocess
 
 from enum import Enum
@@ -9,6 +10,13 @@ from gaid.messages import print_error, print_success, print_warning
 class GitTarget(Enum):
     COMMIT = "commit"
     PR = "pr"
+
+
+class RepoInfo:
+    owner_name: str
+    repo_name: str
+    current_branch: str
+    default_branch: str
 
 
 def create_commit(message):
@@ -35,7 +43,7 @@ def get_diffs(target: GitTarget, branch: str = "") -> str:
     """
     try:
         config = Config()
-        default_branch = config.get_option("default_branch")
+        default_branch = get_repo_info().default_branch
         if target == GitTarget.COMMIT:
             diff_stat = subprocess.run(
                 ["git", "diff", "--cached", "--stat"], capture_output=True, text=True
@@ -103,3 +111,46 @@ def get_diffs(target: GitTarget, branch: str = "") -> str:
         else:
             print_error()
         return None
+
+
+def get_repo_info() -> RepoInfo:
+    """
+    Retrieves the repository information.
+
+    Returns:
+        A tuple containing the repository name, owner name, current branch, and default branch.
+    """
+    try:
+        info = RepoInfo()
+        # Get the repository URL
+        repo_url = subprocess.run(
+            ["git", "config", "--get", "remote.origin.url"],
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+
+        # Extract the owner and repository name from the URL
+        match = re.search(r"github.com[:/](.+)/(.+?)(.git)?$", repo_url)
+        if match:
+            info.owner_name = match.group(1)
+            info.repo_name = match.group(2)
+        else:
+            print_error("Unable to parse repository URL.")
+
+        # Get the current branch name
+        info.current_branch = subprocess.run(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True
+        ).stdout.strip()
+
+        # Get the default branch name
+        info.default_branch = subprocess.run(
+            ["git", "remote", "show", "origin"], capture_output=True, text=True
+        ).stdout
+        info.default_branch = re.search(
+            r"HEAD branch: (.+)", info.default_branch
+        ).group(1)
+
+        return info
+    except Exception as e:
+        print(f"Error: {e}")
+        return None, None, None, None

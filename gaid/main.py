@@ -8,6 +8,8 @@ from typing import Annotated, Optional
 from gaid.commits import Commits
 from gaid.config import Config
 from gaid.git import create_commit
+from gaid.github import create_pr
+from gaid.pull_requests import PullRequests
 
 app = typer.Typer(no_args_is_help=True, rich_markup_mode="rich")
 
@@ -68,7 +70,27 @@ def pr():
     """
     Generate a pull request
     """
-    typer.echo("Not implemented")
+    prs = PullRequests()
+    message = None
+    while not message:
+        message = prs.get_pr_message()
+        if not message:
+            raise typer.Exit()
+
+        print(f":bookmark: | [bold blue]Message:[/bold blue]")
+        print(Markdown(f"```md\n{message}\n```"))
+        confirmation = Prompt.ask(
+            ":question: | [bold]Create pull request with this message?[/bold]",
+            choices=["y", "n", "regen"],
+        )
+
+        if confirmation.lower() == "n":
+            print(":x: | [bold red]Pull request aborted[/bold red]")
+            raise typer.Exit()
+        elif confirmation.lower() == "regen":
+            message = None
+
+    create_pr(message)
 
 
 @app.command()
@@ -104,10 +126,11 @@ def config(
             rich_help_panel="Configuration",
         ),
     ] = False,
-    default_branch: Annotated[
+    github_token: Annotated[
         str,
         typer.Option(
-            help="The default git branch to compare against when generating PRs",
+            help="GitHub token to use for PRs",
+            show_default=False,
             rich_help_panel="Configuration",
         ),
     ] = "main",

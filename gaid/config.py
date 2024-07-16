@@ -10,7 +10,7 @@ class Config:
     provider: str = None
     max_changes: int = 500
     max_chars: int = 80
-    default_branch: str = "main"
+    github_token: str = ""
     openai: str = None
 
     def set_option(self, option: str, value: str):
