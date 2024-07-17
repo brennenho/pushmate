@@ -38,6 +38,8 @@ def create_pr(branch: str, message: str) -> str:
 
         if response.status_code == 201:
             return response.json()["html_url"]
+        elif response.status_code == 422:
+            return "422"
 
         return None
     except Exception as e:

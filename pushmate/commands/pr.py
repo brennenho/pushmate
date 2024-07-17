@@ -80,7 +80,10 @@ def run_pr(branch: str):
     with console.status(get_status("creating pull request")):
         pr_link = create_pr(branch, message)
 
-    if pr_link:
+    if pr_link == "422":
+        print_error("validation failed: does the branch exist on github?")
+        raise typer.Exit()
+    elif pr_link:
         print_success("pull request created")
         typer.launch(pr_link)
     else:
