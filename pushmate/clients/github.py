@@ -37,7 +37,7 @@ def create_pr(branch: str, message: str) -> str:
         response = requests.post(url=url, headers=headers, json=data)
 
         if response.status_code == 201:
-            return response.json()["url"]
+            return response.json()["html_url"]
 
         return None
     except Exception as e:

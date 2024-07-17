@@ -1,5 +1,6 @@
 import typer
 
+from rich import print
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.prompt import Prompt
