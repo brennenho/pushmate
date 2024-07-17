@@ -1,4 +1,4 @@
-from pushmate.git import GitTarget, get_diffs
+from pushmate.git import GitTarget
 from rich import print
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
@@ -57,7 +57,8 @@ class PullRequests:
                 description="Generating pull request message...", total=None
             )
 
-            diff_output = get_diffs(GitTarget.PR)
+            # diff_output = get_diffs(GitTarget.PR)
+            diff_output = "diff_output"
             if not diff_output:
                 return None
 

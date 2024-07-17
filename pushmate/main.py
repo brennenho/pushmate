@@ -7,9 +7,8 @@ from rich.prompt import Prompt
 from rich.table import Table
 from typing import Annotated, Optional
 
-from pushmate.commits import Commits
+from pushmate.commands.commit import run_commit
 from pushmate.config import Config
-from pushmate.git import create_commit
 from pushmate.github import create_pr
 from pushmate.pull_requests import PullRequests
 from pushmate.messages import (
@@ -43,27 +42,7 @@ def commit(
     """
     Use AI to generate a commit message and commit staged changes
     """
-    commits = Commits()
-    message = None
-    while not message:
-        message = commits.get_commit_message(max_chars)
-        if message == "":
-            raise typer.Exit()
-
-        print_info("commit message:")
-        print(Markdown(f"```md\n{message}\n```"))
-        confirmation = Prompt.ask(
-            ":question: | [bold]generate a commit with this message?[/bold]",
-            choices=["y", "n", "regen"],
-        )
-
-        if confirmation.lower() == "n":
-            print_abort("commit aborted")
-            raise typer.Exit()
-        elif confirmation.lower() == "regen":
-            message = None
-
-    create_commit(message)
+    run_commit(max_chars)
 
 
 @app.command()

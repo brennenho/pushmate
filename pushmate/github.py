@@ -1,7 +1,7 @@
 import requests
 
 from pushmate.config import Config
-from pushmate.git import get_repo_info
+from pushmate.git import GitClient
 from pushmate.utils import parse_pr
 
 
@@ -20,7 +20,7 @@ def create_pr(message: str):
         message (str): The pull request message.
     """
     title, body = parse_pr(message)
-    info = get_repo_info()
+    info = GitClient.get_repo_info()
     url = f"https://api.github.com/repos/{info.owner_name}/{info.repo_name}/pulls"
     data = {
         "title": title,
