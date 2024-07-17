@@ -1,17 +1,13 @@
 import typer
 
-from rich import print
 from rich.console import Console
-from rich.markdown import Markdown
-from rich.prompt import Prompt
 from rich.table import Table
 from typing import Annotated, Optional
 
 from pushmate.commands.commit import run_commit
-from pushmate.config import Config
-from pushmate.github import create_pr
-from pushmate.pull_requests import PullRequests
-from pushmate.messages import (
+from pushmate.commands.pr import run_pr
+from pushmate.commands.config import Config
+from pushmate.utils.messages import (
     print_abort,
     print_info,
     print_info,
@@ -46,31 +42,20 @@ def commit(
 
 
 @app.command()
-def pr():
+def pr(
+    branch: Annotated[
+        str,
+        typer.Option(
+            help="Branch to merge into. Leave blank to use the default branch.",
+            show_default=False,
+            rich_help_panel="Configuration",
+        ),
+    ] = "",
+):
     """
     Use AI to generate a pull request
     """
-    prs = PullRequests()
-    message = None
-    while not message:
-        message = prs.get_pr_message()
-        if not message:
-            raise typer.Exit()
-
-        print_info("pull request message:")
-        print(Markdown(f"```md\n{message}\n```"))
-        confirmation = Prompt.ask(
-            ":question: | [bold]generate a pull request with this message?[/bold]",
-            choices=["y", "n", "regen"],
-        )
-
-        if confirmation.lower() == "n":
-            print_abort("pull request aborted")
-            raise typer.Exit()
-        elif confirmation.lower() == "regen":
-            message = None
-
-    create_pr(message)
+    run_pr(branch)
 
 
 @app.command()

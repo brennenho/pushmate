@@ -3,8 +3,8 @@ import subprocess
 
 from enum import Enum
 
-from pushmate.config import Config
-from pushmate.messages import print_error, print_success
+from pushmate.commands.config import Config
+from pushmate.utils.messages import print_error, print_success
 
 
 class GitTarget(Enum):
@@ -21,15 +21,15 @@ class RepoInfo:
 
 class GitClient:
     target: GitTarget
-    default_branch: str
+    repo_info: RepoInfo
     valid_files: list[str]
 
     def __init__(self, target: GitTarget):
         self.target = target
-        self.default_branch = GitClient.get_repo_info().default_branch
+        self.repo_info = GitClient.get_repo_info()
         self.valid_files = []
 
-    def create_commit(self, message: str) -> None:
+    def create_commit(self, message: str) -> bool:
         """
         Creates a new commit with the given message.
 
@@ -38,9 +38,9 @@ class GitClient:
         """
         try:
             subprocess.run(["git", "commit", "-m", message])
-            print_success("commit created")
+            return True
         except Exception as e:
-            print_error()
+            return False
 
     def get_diff_files(self, branch: str = "") -> list[str]:
         """
@@ -58,8 +58,10 @@ class GitClient:
                     text=True,
                 )
             elif self.target == GitTarget.PR:
+                if not branch:
+                    branch = self.repo_info.default_branch
                 diff_stat = subprocess.run(
-                    ["git", "diff", f"{self.default_branch}..{branch}", "--stat"],
+                    ["git", "diff", f"{branch}", "--stat"],
                     capture_output=True,
                     text=True,
                 )
@@ -116,8 +118,10 @@ class GitClient:
                     text=True,
                 )
             elif self.target == GitTarget.PR:
+                if not branch:
+                    branch = self.repo_info.default_branch
                 diff = subprocess.run(
-                    ["git", "diff", f"{self.default_branch}..{branch}", "--", file],
+                    ["git", "diff", f"{branch}", "--", file],
                     capture_output=True,
                     text=True,
                 )

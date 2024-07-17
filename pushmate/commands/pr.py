@@ -1,12 +1,11 @@
 import typer
 
-from rich import print
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.prompt import Prompt
 
-from pushmate.commands.config import Config
 from pushmate.clients.git import GitClient, GitTarget
+from pushmate.clients.github import create_pr
 from pushmate.clients.llm_client import LLMClient
 from pushmate.utils.messages import (
     get_prompt,
@@ -19,11 +18,10 @@ from pushmate.utils.messages import (
 console = Console()
 
 
-def run_commit(max_chars: int):
-
-    git_client = GitClient(GitTarget.COMMIT)
+def run_pr(branch: str):
+    git_client = GitClient(GitTarget.PR)
     with console.status(get_status("retrieving changed files")):
-        invalid_files = git_client.get_diff_files()
+        invalid_files = git_client.get_diff_files(branch)
 
     if not git_client.valid_files:
         raise typer.Exit()
@@ -40,7 +38,7 @@ def run_commit(max_chars: int):
             git_client.valid_files.append(filename)
 
     with console.status(get_status("analyzing changed files")):
-        diff_output = git_client.get_diffs()
+        diff_output = git_client.get_diffs(branch)
 
     # For some reason printing this within the status context manager causes the spinner to hang
     if diff_output:
@@ -53,19 +51,19 @@ def run_commit(max_chars: int):
     generation = "generating"
     message = None
     while not message:
-        with console.status(get_status(f"{generation} commit message")):
-            prompt = get_commit_prompt(diff_output, max_chars)
+        with console.status(get_status(f"{generation} pull request message")):
+            prompt = get_pr_prompt(diff_output)
             message = llm_client.prompt(prompt)
 
         if message:
-            print_success("commit message generated")
+            print_success("pull request message generated")
         else:
-            print_error("unable to generate commit message")
+            print_error("unable to generate pull request message")
             raise typer.Exit()
 
         print(Markdown(f"```md\n{message}\n```"))
         confirmation = Prompt.ask(
-            get_prompt("generate a commit with this message?"),
+            get_prompt("generate a pull request with this message?"),
             choices=["Y", "n", "regen"],
             default="Y",
         )
@@ -78,40 +76,40 @@ def run_commit(max_chars: int):
             message = None
             generation = "regenerating"
 
-    with console.status(get_status("creating commit")):
-        commit_created = git_client.create_commit(message)
+    with console.status(get_status("creating pull request")):
+        pr_link = create_pr(branch, message)
 
-    if commit_created:
-        print_success("commit created")
+    if pr_link:
+        print_success("pull request created")
+        typer.launch(pr_link)
     else:
         print_error()
         raise typer.Exit()
 
 
-def get_commit_prompt(diff_output: str, max_chars) -> list[dict[str, str]]:
+def get_pr_prompt(diff_output: str):
     """
-    Generates a commit prompt based on the given diff output.
-
-    Args:
-        diff_output (str): The diff output containing the list of changes.
-
-    Returns:
-        list: A list of dictionaries representing the commit prompt. Each dictionary has two keys:
-            - 'role': The role of the message (either 'system' or 'user').
-            - 'content': The content of the message.
+    Generate a pull request prompt based on the given diff output.
     """
-
-    if max_chars == 0:
-        max_chars = Config().get_option("max_chars")
-
     return [
         {
             "role": "system",
             "content": f"""
-                            You are a helpful agent that evaluates changes in repositories and summarizes them into a git commit message. 
-                            Given a list of changes, summarize all changes into a single, concise commit message that is no more than {max_chars} characters.
-                            Ignore minor changes if needed to keep the message concise and within the character limit. 
-                            Only output the single git commit message.
+                            You are a helpful agent that evaluates changes in repository branches and summarizes them into a pull request. 
+                            Given a list of changes, fill out the following pull request template with the necessary information. 
+                            Instructions for each section are between the '<>' brackets. 
+                            You can use markdown to format your message.
+                            Prioritize the most important changes and keep the message as concise as possible.
+                            Only return the filled-out pull request template with no additional information.
+
+                            Title: <concise pull request title summarizing key changes>
+                            <1-3 sentence summary of the pull request, highlighting major changes concisely>
+
+                            ### Key Changes:
+                            - <bulleted list of major changes, skipping minor changes or changes from dependencies>
+
+                            ### Further Improvements:
+                            - <a short list of potential future improvements>
                             """,
         },
         {
