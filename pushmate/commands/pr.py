@@ -77,10 +77,23 @@ def run_pr(branch: str):
             message = None
             generation = "regenerating"
 
+    push_status = GitClient.push_changes()
+
+    if push_status:
+        print_success("pushed committed changes")
+    else:
+        print_error("could not push committed changes")
+        raise typer.Exit()
+
     with console.status(get_status("creating pull request")):
         pr_link = create_pr(branch, message)
 
-    if pr_link:
+    if pr_link == "422":
+        print_error(
+            "validation failed: both branches must exist on github and cannot already have a pull request"
+        )
+        raise typer.Exit()
+    elif pr_link:
         print_success("pull request created")
         typer.launch(pr_link)
     else:
