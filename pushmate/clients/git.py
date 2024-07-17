@@ -173,3 +173,11 @@ class GitClient:
         except Exception as e:
             print_error()
             return None, None, None, None
+
+    @staticmethod
+    def push_changes():
+        try:
+            subprocess.run(["git", "push"])
+            return True
+        except Exception as e:
+            return False

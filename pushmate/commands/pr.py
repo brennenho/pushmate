@@ -77,6 +77,15 @@ def run_pr(branch: str):
             message = None
             generation = "regenerating"
 
+    with console.status(get_status("pushing committed changes")):
+        push_status = GitClient.push_changes()
+
+    if push_status:
+        print_success("pushed committed changes")
+    else:
+        print_error("could not push committed changes")
+        raise typer.Exit()
+
     with console.status(get_status("creating pull request")):
         pr_link = create_pr(branch, message)
 
