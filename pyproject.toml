@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pushmate"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Brennen Ho <pushmate@brennen.dev>"]
 readme = "README.md"
