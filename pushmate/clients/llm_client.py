@@ -1,8 +1,8 @@
 from enum import Enum
 from openai import OpenAI
 
-from pushmate.config import Config
-from pushmate.messages import print_error
+from pushmate.commands.config import Config
+from pushmate.utils.messages import print_error
 
 
 class LLMProvider(Enum):
