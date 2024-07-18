@@ -1,3 +1,4 @@
+import inquirer
 import typer
 
 from rich import print
@@ -8,6 +9,7 @@ from rich.prompt import Prompt
 from pushmate.clients.git import GitClient, GitTarget
 from pushmate.clients.github import create_pr
 from pushmate.clients.llm_client import LLMClient
+from pushmate.utils.editor import edit_text
 from pushmate.utils.messages import (
     get_prompt,
     get_status,
@@ -63,11 +65,20 @@ def run_pr(branch: str):
             raise typer.Exit()
 
         print(Markdown(f"```md\n{message}\n```"))
-        confirmation = Prompt.ask(
-            get_prompt("generate a pull request with this message?"),
-            choices=["Y", "n", "regen"],
-            default="Y",
-        )
+        confirmation = inquirer.prompt(
+            [
+                inquirer.List(
+                    "action",
+                    message="create a pull request with this message?",
+                    choices=[
+                        "create pull request",
+                        "edit pull request message",
+                        "regenerate pull request message",
+                        "abort",
+                    ],
+                ),
+            ]
+        )["action"]
 
         if confirmation.lower() == "n":
             print_abort("commit aborted")
@@ -76,6 +87,9 @@ def run_pr(branch: str):
         elif confirmation.lower() == "regen":
             message = None
             generation = "regenerating"
+
+        elif confirmation.lower() == "edit pull request message":
+            message = edit_text(message)
 
     push_status = GitClient.push_changes()
 

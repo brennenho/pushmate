@@ -1,3 +1,4 @@
+import inquirer
 import typer
 
 from rich import print
@@ -5,9 +6,11 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.prompt import Prompt
 
+
 from pushmate.commands.config import Config
 from pushmate.clients.git import GitClient, GitTarget
 from pushmate.clients.llm_client import LLMClient
+from pushmate.utils.editor import edit_text
 from pushmate.utils.messages import (
     get_prompt,
     get_status,
@@ -20,7 +23,6 @@ console = Console()
 
 
 def run_commit(max_chars: int):
-
     git_client = GitClient(GitTarget.COMMIT)
     with console.status(get_status("retrieving changed files")):
         invalid_files = git_client.get_diff_files()
@@ -64,19 +66,31 @@ def run_commit(max_chars: int):
             raise typer.Exit()
 
         print(Markdown(f"```md\n{message}\n```"))
-        confirmation = Prompt.ask(
-            get_prompt("generate a commit with this message?"),
-            choices=["Y", "n", "regen"],
-            default="Y",
-        )
+        confirmation = inquirer.prompt(
+            [
+                inquirer.List(
+                    "action",
+                    message="create a commit with this message?",
+                    choices=[
+                        "create commit",
+                        "edit commit message",
+                        "regenerate commit message",
+                        "abort",
+                    ],
+                ),
+            ]
+        )["action"]
 
-        if confirmation.lower() == "n":
+        if confirmation.lower() == "abort":
             print_abort("commit aborted")
             raise typer.Exit()
 
-        elif confirmation.lower() == "regen":
+        elif confirmation.lower() == "regenerate commit message":
             message = None
             generation = "regenerating"
+
+        elif confirmation.lower() == "edit commit message":
+            message = edit_text(message)
 
     with console.status(get_status("creating commit")):
         commit_created = git_client.create_commit(message)

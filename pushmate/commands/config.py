@@ -1,7 +1,8 @@
 import os
+import typer
 import yaml
 
-CONFIG_FILE_PATH = os.path.join(os.path.expanduser("~"), ".config", "pm", "config.yml")
+CONFIG_FILE_PATH = os.path.join(typer.get_app_dir("pushmate"), "config.yml")
 
 
 class Config:
