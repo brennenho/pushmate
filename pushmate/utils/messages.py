@@ -20,7 +20,7 @@ def print_info(message: str):
 
 
 def get_prompt(message: str):
-    return f":speech_balloon: [yellow]{message}[/yellow]"
+    return f"[[yellow]?[/yellow]] {message}"
 
 
 def get_status(message: str):

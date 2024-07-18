@@ -10,10 +10,11 @@ pm = "pushmate.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-typer = {extras = ["all"], version = "^0.12.3"}
+typer = {version = "^0.12.3"}
 pyyaml = "^6.0.1"
 openai = "^1.35.13"
 requests = "^2.32.3"
+inquirer = "^3.3.0"
 
 
 [build-system]
