@@ -86,6 +86,12 @@ def run_pr(branch: str):
             raise typer.Exit()
 
         elif confirmation.lower() == "regenerate pull request message":
+            conversation.append(
+                {
+                    "role": "user",
+                    "content": "Edit this pull request message for clarity and concision.",
+                }
+            )
             message = None
             generation = "regenerating"
 

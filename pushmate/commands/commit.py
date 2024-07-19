@@ -87,6 +87,12 @@ def run_commit(max_chars: int):
             raise typer.Exit()
 
         elif confirmation.lower() == "regenerate commit message":
+            conversation.append(
+                {
+                    "role": "user",
+                    "content": "Edit this commit message for clarity and concision.",
+                }
+            )
             message = None
             generation = "regenerating"
 
