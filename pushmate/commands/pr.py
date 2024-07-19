@@ -53,10 +53,10 @@ def run_pr(branch: str):
     llm_client = LLMClient()
     generation = "generating"
     message = None
+    conversation = get_pr_prompt(diff_output)
     while not message:
         with console.status(get_status(f"{generation} pull request message")):
-            prompt = get_pr_prompt(diff_output)
-            message = llm_client.prompt(prompt)
+            message = llm_client.prompt(conversation)
 
         if message:
             print_success("pull request message generated")
@@ -73,6 +73,7 @@ def run_pr(branch: str):
                     choices=[
                         "create pull request",
                         "edit pull request message",
+                        "instruct llm on improvements",
                         "regenerate pull request message",
                         "abort",
                     ],
@@ -80,16 +81,28 @@ def run_pr(branch: str):
             ]
         )["action"]
 
-        if confirmation.lower() == "n":
+        if confirmation.lower() == "abort":
             print_abort("commit aborted")
             raise typer.Exit()
 
-        elif confirmation.lower() == "regen":
+        elif confirmation.lower() == "regenerate pull request message":
+            conversation.append(
+                {
+                    "role": "user",
+                    "content": "Edit this pull request message for clarity and concision.",
+                }
+            )
             message = None
             generation = "regenerating"
 
         elif confirmation.lower() == "edit pull request message":
             message = edit_text(message)
+
+        elif confirmation.lower() == "instruct llm on improvements":
+            feedback = Prompt.ask(get_prompt("feedback"))
+            conversation.append({"role": "user", "content": feedback})
+            message = None
+            generation = "regenerating with feedback"
 
     push_status = GitClient.push_changes()
 
