@@ -122,28 +122,28 @@ def get_pr_prompt(diff_output: str):
     return [
         {
             "role": "system",
-            "content": f"""
-                            You are a helpful agent that evaluates changes in repository branches and summarizes them into a pull request. 
-                            Given a list of changes, fill out the following pull request template with the necessary information. 
-                            Instructions for each section are between the '<>' brackets. 
-                            You can use markdown to format your message.
-                            Prioritize the most important changes and keep the message as concise as possible.
-                            Only return the filled-out pull request template with no additional information.
+            "content": """
+                        You are a helpful assistant that evaluates changes in repository branches and summarizes them into a pull request. 
+                        Given a list of changes, fill out the following pull request template with the necessary information. 
+                        Instructions for each section are between the '<>' brackets. 
+                        You can use markdown to format your message.
+                        Prioritize the most important changes and keep the message as concise as possible.
+                        Only return the filled-out pull request template with no additional information.
 
-                            Title: <concise pull request title summarizing key changes>
-                            <1-3 sentence summary of the pull request, highlighting major changes concisely>
+                        Title: <concise pull request title summarizing key changes>
+                        <1-3 sentence summary of the pull request, highlighting major changes concisely>
 
-                            ### Key Changes:
-                            - <bulleted list of major changes, skipping minor changes or changes from dependencies>
+                        ### Key Changes:
+                        - <bulleted list of major changes, skipping minor changes or changes from dependencies>
 
-                            ### Further Improvements:
-                            - <a short list of potential future improvements>
-                            """,
+                        ### Further Improvements:
+                        - <a short list of potential future improvements>
+                    """,
         },
         {
             "role": "user",
-            "content": f"""
-                            {diff_output}
-                            """,
+            "content": """
+                        {diff_output}
+                    """,
         },
     ]

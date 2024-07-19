@@ -121,17 +121,11 @@ def get_commit_prompt(diff_output: str, max_chars) -> list[dict[str, str]]:
     return [
         {
             "role": "system",
-            "content": f"""
-                            You are a helpful agent that evaluates changes in repositories and summarizes them into a git commit message. 
-                            Given a list of changes, summarize all changes into a single, concise commit message that is no more than {max_chars} characters.
-                            Ignore minor changes if needed to keep the message concise and within the character limit. 
-                            Only output the single git commit message.
-                            """,
+            "content": "You are a helpful assistant that evaluates changes in repositories and summarizes them into a git commit message. Your goal is to generate a concise and meaningful commit message from a list of changes. The message should not exceed a specified character limit.",
         },
         {
             "role": "user",
-            "content": f"""
-                            {diff_output}
-                            """,
+            "content": f"Given the following changes, create a single git commit message that is no more than {max_chars} characters. Ignore minor or irrelevant changes if necessary to stay within the limit. Focus on the most significant updates, such as new features, bug fixes, and important refactorings. The commit message should clearly reflect the essence of the changes.",
         },
+        {"role": "user", "content": f"{diff_output}"},
     ]
