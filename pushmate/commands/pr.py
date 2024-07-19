@@ -142,7 +142,7 @@ def get_pr_prompt(diff_output: str):
         },
         {
             "role": "user",
-            "content": """
+            "content": f"""
                         {diff_output}
                     """,
         },

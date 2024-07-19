@@ -61,7 +61,7 @@ class GitClient:
                 if not branch:
                     branch = self.repo_info.default_branch
                 diff_stat = subprocess.run(
-                    ["git", "diff", f"{branch}", "--stat"],
+                    ["git", "diff", f"origin/{branch}", "HEAD", "--stat"],
                     capture_output=True,
                     text=True,
                 )
@@ -75,7 +75,10 @@ class GitClient:
 
                 # Empty diff output means no changes staged to commit
                 if not diff_output:
-                    print_error("no changes staged to commit")
+                    if self.target == GitTarget.COMMIT:
+                        print_error("no changes staged to commit")
+                    else:
+                        print_error("no committed changes to merge")
                     return None
             else:
                 return None
@@ -121,7 +124,7 @@ class GitClient:
                 if not branch:
                     branch = self.repo_info.default_branch
                 diff = subprocess.run(
-                    ["git", "diff", f"{branch}", "--", file],
+                    ["git", "diff", f"origin/{branch}", "HEAD", "--", file],
                     capture_output=True,
                     text=True,
                 )

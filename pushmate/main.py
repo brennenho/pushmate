@@ -21,7 +21,7 @@ console = Console()
 @app.callback()
 def callback():
     """
-    PushMate: automate your git workflow with AI
+    PushMate: automate your git workflow with AI.
     """
 
 
@@ -36,7 +36,7 @@ def commit(
     ] = 0,
 ):
     """
-    Use AI to generate a commit message and commit staged changes
+    Automatically generate a git commit based on the currently staged changes.
     """
     run_commit(max_chars)
 
@@ -46,14 +46,14 @@ def pr(
     branch: Annotated[
         str,
         typer.Option(
-            help="Branch to merge into. Leave blank to use the default branch.",
+            help="The branch to pull request against. Leave blank to use the default branch.",
             show_default=False,
             rich_help_panel="Configuration",
         ),
     ] = "",
 ):
     """
-    Use AI to generate a pull request
+    Automatically generate a GitHub pull request based on the currently branch's HEAD.
     """
     run_pr(branch)
 
@@ -63,14 +63,14 @@ def config(
     value: Annotated[
         Optional[str],
         typer.Argument(
-            help="Updated value for the configuration option. Leave blank to view the current value.",
+            help="The value to set an option to. Leave blank to view the current value.",
             show_default=False,
         ),
     ] = None,
     provider: Annotated[
         bool,
         typer.Option(
-            help="The LLM provider to use",
+            help="Provider to use for LLM calls.",
             show_default=False,
             rich_help_panel="Configuration",
         ),
@@ -78,7 +78,7 @@ def config(
     max_changes: Annotated[
         bool,
         typer.Option(
-            help="Maximum # of changes per file. Files with more changes will not be summarized. (Default: 500)",
+            help="Maximum # of changes to automatically include in a commit message. Files with more changes will be prompted for inclusion. (Default: 500)",
             show_default=False,
             rich_help_panel="Configuration",
         ),
@@ -86,7 +86,7 @@ def config(
     max_chars: Annotated[
         bool,
         typer.Option(
-            help="Maximum # of characters the commit message should be (Default: 80)",
+            help="Maximum # of characters for a commit message. (Default: 50)",
             show_default=False,
             rich_help_panel="Configuration",
         ),
@@ -94,7 +94,7 @@ def config(
     github_token: Annotated[
         bool,
         typer.Option(
-            help="GitHub token to use for PRs",
+            help="GitHub API Token.",
             show_default=False,
             rich_help_panel="Configuration",
         ),
@@ -102,12 +102,12 @@ def config(
     openai: Annotated[
         bool,
         typer.Option(
-            help="OpenAI API Key", show_default=False, rich_help_panel="Configuration"
+            help="OpenAI API Key.", show_default=False, rich_help_panel="Configuration"
         ),
     ] = False,
 ):
     """
-    Set or view configuration options
+    Set or view PushMate configuration options.
     """
     config = Config()
     options = {k: v for k, v in locals().items() if v is True}
