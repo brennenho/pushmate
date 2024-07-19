@@ -54,10 +54,10 @@ def run_commit(max_chars: int):
     llm_client = LLMClient()
     generation = "generating"
     message = None
+    conversation = get_commit_prompt(diff_output, max_chars)
     while not message:
         with console.status(get_status(f"{generation} commit message")):
-            prompt = get_commit_prompt(diff_output, max_chars)
-            message = llm_client.prompt(prompt)
+            message = llm_client.prompt(conversation)
 
         if message:
             print_success("commit message generated")
@@ -74,6 +74,7 @@ def run_commit(max_chars: int):
                     choices=[
                         "create commit",
                         "edit commit message",
+                        "instruct llm on improvements",
                         "regenerate commit message",
                         "abort",
                     ],
@@ -88,6 +89,12 @@ def run_commit(max_chars: int):
         elif confirmation.lower() == "regenerate commit message":
             message = None
             generation = "regenerating"
+
+        elif confirmation.lower() == "instruct llm on improvements":
+            feedback = Prompt.ask(get_prompt("feedback"))
+            conversation.append({"role": "user", "content": feedback})
+            message = None
+            generation = "regenerating with feedback"
 
         elif confirmation.lower() == "edit commit message":
             message = edit_text(message)
