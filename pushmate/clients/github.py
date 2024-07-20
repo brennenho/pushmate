@@ -44,3 +44,37 @@ def create_pr(branch: str, message: str) -> str:
         return None
     except Exception as e:
         return None
+
+
+def create_issue(
+    title: str, body: str, labels: list[str] = [], assignees: list[str] = []
+):
+    """
+    Creates a new issue with the given title and body.
+
+    Args:
+        title (str): The issue title.
+        body (str): The issue body.
+        labels (list): A list of labels to assign to the issue.
+        assignees (list): A list of assignees for the issue.
+    """
+    try:
+        info = GitClient.get_repo_info()
+        url = f"https://api.github.com/repos/{info.owner_name}/{info.repo_name}/issues"
+        data = {
+            "title": title,
+            "body": body,
+            "labels": labels,
+            "assignees": assignees,
+        }
+
+        response = requests.post(url=url, headers=headers, json=data)
+
+        if response.status_code == 201:
+            return response.json()["html_url"]
+        elif response.status_code == 422:
+            return "422"
+
+        return None
+    except Exception as e:
+        return None

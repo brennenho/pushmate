@@ -36,7 +36,7 @@ class LLMClient:
             response = ""
             match self.provider:
                 case LLMProvider.OPEN_AI.value:
-                    self.model = "gpt-4o"
+                    self.model = "gpt-4o-mini"
                     response = self.openai_prompt(prompt)
                 case _:
                     raise ValueError(f"Provider not supported")

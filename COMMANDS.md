@@ -18,6 +18,7 @@ $ pm [OPTIONS] COMMAND [ARGS]...
 
 * `commit`: Automatically generate a git commit based on the currently staged changes.
 * `config`: Set or view PushMate configuration options.
+* `issue`: Automatically generate a GitHub issue based on user prompts.
 * `pr`: Automatically generate a GitHub pull request based on the currently branch's HEAD.
 
 ## `pm commit`
@@ -56,6 +57,20 @@ $ pm config [OPTIONS] [VALUE]
 * `--max-chars`: Maximum # of characters for a commit message. (Default: 50)
 * `--github-token`: GitHub API Token.
 * `--openai`: OpenAI API Key.
+* `--help`: Show this message and exit.
+
+## `pm issue`
+
+Automatically generate a GitHub issue based on user prompts.
+
+**Usage**:
+
+```console
+$ pm issue [OPTIONS]
+```
+
+**Options**:
+
 * `--help`: Show this message and exit.
 
 ## `pm pr`

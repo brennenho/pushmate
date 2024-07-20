@@ -5,6 +5,7 @@ from rich.table import Table
 from typing import Annotated, Optional
 
 from pushmate.commands.commit import run_commit
+from pushmate.commands.issue import run_issue
 from pushmate.commands.pr import run_pr
 from pushmate.commands.config import Config
 from pushmate.utils.messages import (
@@ -56,6 +57,14 @@ def pr(
     Automatically generate a GitHub pull request based on the currently branch's HEAD.
     """
     run_pr(branch)
+
+
+@app.command()
+def issue():
+    """
+    Automatically generate a GitHub issue based on user prompts.
+    """
+    run_issue()
 
 
 @app.command()
